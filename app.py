@@ -122,6 +122,47 @@ class Student(DataBase):
         except Exception as err:
             return f'Error when delete student: {err}'
 
+    @staticmethod
+    def find_by_name():
+        try:
+            name = input('Nhap ten : ')
+            find_students = list(Student.DATABASE.find({'name': f'{name}'}))
+
+            if find_students:
+                for student in find_students:
+                    pprint(student)
+            else:
+                print('Khong tim thay sinh vien co ten da nhap')
+        except Exception as err:
+            print(f'Error when find student by name: {err}')
+
+    @staticmethod
+    def find_greater_score():
+        try:
+            score = int(input('Nhap diem: '))
+            find_student = list(Student.DATABASE.find({'scores.0': {'$gt': score}}))
+
+            if find_student:
+                for student in find_student:
+                    pprint(student)
+            else:
+                print('Khong tim thay sinh vien co diem dien kinh cao hon diem nhap')
+        except Exception as err:
+            print(f'Error when find student greater than socre: {err}')
+
+    @staticmethod
+    def find_greater_sum_of_scores():
+        try:
+            score = int(input('Nhap diem: '))
+            find_student = list(Student.DATABASE.aggregate([{ '$project' : {
+                        'id_student': '$id_student', 'total_scores': { '$sum': '$scores'}}}]))
+            for st in find_student:
+                if st['total_scores'] > score:
+                    print(st)
+
+        except Exception as err:
+            print(f'Error when find student: {err}')
+
 
 if __name__ == '__main__':
     student = Student()
@@ -132,6 +173,9 @@ if __name__ == '__main__':
             3. Tao moi sinh vien
             4. Cap nhat sinh vien
             5. Xoa sinh vien
+            6. Tim theo ten
+            7. Sinh vien co diem lon hon
+            8. Tong diem cac mon lon hon
             0. Thoat khoi chuong trinh
             """)
         choose = int(input('Nhap lua chon: '))
@@ -146,5 +190,11 @@ if __name__ == '__main__':
                 Student.update()
             case 5:
                 Student.delete()
+            case 6:
+                Student.find_by_name()
+            case 7:
+                Student.find_greater_score()
+            case 8:
+                Student.find_greater_sum_of_scores()
             case default:
                 break
